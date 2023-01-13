@@ -11,47 +11,37 @@ import {
     TouchableWithoutFeedback,
     Dimensions,
 } from "react-native";
-import * as Font from "expo-font";
-import AppLoading from "expo-app-loading";
-import InputPassword from "../Components/InputPassword/InputPassword";
+import InputPassword from "../Components/FormsComponents/InputPassword";
 import BGAuthScreen from "../Components/BGAuthScreen/BGAuthScreen";
-
-const loadApplication = async () => {
-    await Font.loadAsync({
-        "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
-        "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-    });
-};
 
 const initialState = {
     email: "",
     password: "",
 };
 
-export default function LoginScreen({ changePage }) {
+export default function LoginScreen({ setIsAuth, navigation }) {
     const [isShowKeyboard, setIsShowKeyboard] = useState(false);
     const [state, setState] = useState(initialState);
-    const [iasReady, setIasReady] = useState(false);
 
-    // useEffect(() => {
-    //     // const onChange = () => {
-    //     //     const width = Dimensions.get("window").width;
-    //     // };
-    //     // Dimensions.addEventListener("change", onChange);
-    //     // return () => {
-    //     //     Dimensions.removeEventListener("change", onChange);
-    //     // };
-    // }, []);
-
-    if (!iasReady) {
-        return (
-            <AppLoading
-                startAsync={loadApplication}
-                onFinish={() => setIasReady(true)}
-                onError={console.warn}
-            />
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                setIsShowKeyboard(true);
+            }
         );
-    }
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setIsShowKeyboard(false);
+            }
+        );
+
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
 
     const keyboardHide = () => {
         setIsShowKeyboard(false);
@@ -62,10 +52,11 @@ export default function LoginScreen({ changePage }) {
         setState(initialState);
         keyboardHide();
         console.log("Данні з форми Login: ", state)
+        setIsAuth(true)
     };
 
     const switchPage = () => {
-        changePage("Registration")
+        navigation.navigate("Registration");
     };
 
     return (
@@ -73,7 +64,7 @@ export default function LoginScreen({ changePage }) {
             <View style={styles.container}>
                 <BGAuthScreen>
                     <KeyboardAvoidingView
-                        style={{ flex: 1, justifyContent: "flex-end" }}
+                        style={{ flex: 1, justifyContent: "flex-end", }}
                         behavior={Platform.OS === "ios" ? "padding" : "height"}
                     >
                         <View
@@ -92,6 +83,8 @@ export default function LoginScreen({ changePage }) {
                                 }
                                 value={state.email}
                                 placeholder="Адреса електронної скриньки"
+                                returnKeyType='My Custom button'
+                                onSubmitEditing={() => console.log("123")}
                             />
                             <InputPassword style={styles.input}
                                 onFocus={() => setIsShowKeyboard(true)}
@@ -99,6 +92,8 @@ export default function LoginScreen({ changePage }) {
                                     setState((prevState) => ({ ...prevState, password: value }))
                                 }
                                 value={state.password}
+
+
                             />
                             <TouchableOpacity
                                 activeOpacity={0.7}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     StyleSheet,
     Text,
@@ -13,7 +13,7 @@ import {
     ScrollView
 } from "react-native";
 
-import InputPassword from "../Components/InputPassword/InputPassword";
+import InputPassword from "../Components/FormsComponents/InputPassword";
 import BGAuthScreen from "../Components/BGAuthScreen/BGAuthScreen";
 
 const initialState = {
@@ -22,24 +22,32 @@ const initialState = {
     password: "",
 };
 
-const window = Dimensions.get("window");
-const screen = Dimensions.get("screen");
+// const window = Dimensions.get("window");
+// const screen = Dimensions.get("screen");
 
-export default function RegistrationScreen({ changePage }) {
+export default function RegistrationScreen({ navigation }) {
     const [isShowKeyboard, setIsShowKeyboard] = useState(false);
     const [state, setState] = useState(initialState);
 
-    // const [dimensions, setDimensions] = useState({ window, screen });
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                setIsShowKeyboard(true);
+            }
+        );
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setIsShowKeyboard(false);
+            }
+        );
 
-    // useEffect(() => {
-    //     // const onChange = () => {
-    //     //     const width = Dimensions.get("window").width;
-    //     // };
-    //     // Dimensions.addEventListener("change", onChange);
-    //     // return () => {
-    //     //     Dimensions.removeEventListener("change", onChange);
-    //     // };
-    // }, []);
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
 
     const keyboardHide = () => {
         setIsShowKeyboard(false);
@@ -53,7 +61,7 @@ export default function RegistrationScreen({ changePage }) {
     };
 
     const switchPage = () => {
-        changePage("Login")
+        navigation.navigate("Login");
     };
     const chooseAvatar = () => {
         console.log("CLICK chooseAvatar");
