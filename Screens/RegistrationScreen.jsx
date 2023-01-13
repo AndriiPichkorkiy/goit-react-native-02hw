@@ -58,6 +58,7 @@ export default function RegistrationScreen({ navigation }) {
         setState(initialState);
         keyboardHide();
         console.log("Данні з форми Registration: ", state)
+        navigation.navigate("Login")
     };
 
     const switchPage = () => {
