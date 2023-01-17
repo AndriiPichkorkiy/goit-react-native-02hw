@@ -35,11 +35,13 @@ const styles = StyleSheet.create({
         position: "absolute",
         left: "50%",
         transform: [{ translateX: -50 }, { translateY: -50 }],
-        overflow: "hidden"
+        // overflow: "hidden"
     },
     avatarImg: {
         width: "100%",
         height: "100%",
+        overflow: "hidden",
+        borderRadius: 16,
     },
     avatarInputBtn: {
         position: "absolute",

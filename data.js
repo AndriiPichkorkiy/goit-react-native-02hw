@@ -1,7 +1,7 @@
 import location1 from "./assets/images/location1.jpg";
 import location2 from "./assets/images/location2.jpg";
 import location3 from "./assets/images/location3.jpg";
-
+console.log("location1", location1);
 import userDefImg from "./assets/images/User.jpg";
 import anotherUser from "./assets/images/minion.png";
 

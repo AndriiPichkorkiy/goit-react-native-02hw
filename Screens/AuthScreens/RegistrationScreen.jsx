@@ -11,15 +11,21 @@ import {
     TouchableWithoutFeedback,
     Dimensions,
 } from "react-native";
-import InputPassword from "../Components/FormsComponents/InputPassword";
-import BGAuthScreen from "../Components/BGAuthScreen/BGAuthScreen";
+
+import InputPassword from "../../Components/FormsComponents/InputPassword";
+import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
+import Avatar from "../../Components/Avatar/Avatar";
 
 const initialState = {
+    login: "",
     email: "",
     password: "",
 };
 
-export default function LoginScreen({ setIsAuth, navigation }) {
+// const window = Dimensions.get("window");
+// const screen = Dimensions.get("screen");
+
+export default function RegistrationScreen({ navigation }) {
     const [isShowKeyboard, setIsShowKeyboard] = useState(false);
     const [state, setState] = useState(initialState);
 
@@ -51,12 +57,15 @@ export default function LoginScreen({ setIsAuth, navigation }) {
     const submiteForm = () => {
         setState(initialState);
         keyboardHide();
-        console.log("Данні з форми Login: ", state)
-        setIsAuth(true)
+        console.log("Данні з форми Registration: ", state)
+        navigation.navigate("Login")
     };
 
     const switchPage = () => {
-        navigation.navigate("Registration");
+        navigation.navigate("Login");
+    };
+    const chooseAvatar = () => {
+        console.log("CLICK chooseAvatar");
     };
 
     return (
@@ -64,7 +73,7 @@ export default function LoginScreen({ setIsAuth, navigation }) {
             <View style={styles.container}>
                 <BGAuthScreen>
                     <KeyboardAvoidingView
-                        style={{ flex: 1, justifyContent: "flex-end", }}
+                        style={{ flex: 1, justifyContent: "flex-end" }}
                         behavior={Platform.OS === "ios" ? "padding" : "height"}
                     >
                         <View
@@ -73,7 +82,26 @@ export default function LoginScreen({ setIsAuth, navigation }) {
                                 paddingBottom: isShowKeyboard ? 20 : 100,
                             }}
                         >
-                            <Text style={styles.title}>Вхід</Text>
+                            <Avatar isEmplty={true} />
+                            {/* <View style={styles.avatarInput}>
+                                <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={chooseAvatar}
+                                    style={styles.avatarInputBtn}
+                                >
+                                    <Text style={styles.avatarInputBtnText}>+</Text>
+                                </TouchableOpacity>
+                            </View> */}
+                            <Text style={styles.title}>Реєстрація</Text>
+                            <TextInput
+                                style={styles.input}
+                                onFocus={() => setIsShowKeyboard(true)}
+                                onChangeText={(value) =>
+                                    setState((prevState) => ({ ...prevState, login: value }))
+                                }
+                                value={state.login}
+                                placeholder="Логін"
+                            />
                             <TextInput
                                 style={styles.input}
 
@@ -83,8 +111,6 @@ export default function LoginScreen({ setIsAuth, navigation }) {
                                 }
                                 value={state.email}
                                 placeholder="Адреса електронної скриньки"
-                                returnKeyType='My Custom button'
-                                onSubmitEditing={() => console.log("123")}
                             />
                             <InputPassword style={styles.input}
                                 onFocus={() => setIsShowKeyboard(true)}
@@ -92,24 +118,23 @@ export default function LoginScreen({ setIsAuth, navigation }) {
                                     setState((prevState) => ({ ...prevState, password: value }))
                                 }
                                 value={state.password}
-
-
                             />
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 style={styles.formBtn}
                                 onPress={submiteForm}
                             >
-                                <Text style={styles.formBtnText}>Війти</Text>
+                                <Text style={styles.formBtnText}>Зареєструватися</Text>
                             </TouchableOpacity>
                             <TouchableOpacity activeOpacity={0.7} onPress={switchPage}>
-                                <Text style={styles.switcherPage}>Немає акаунта? Зареєструватися</Text>
+                                <Text style={styles.switcherPage}>Вже є аккаунт? Увійти</Text>
                             </TouchableOpacity>
+
                         </View>
                     </KeyboardAvoidingView>
                 </BGAuthScreen>
             </View>
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback >
     );
 }
 
@@ -130,6 +155,7 @@ const styles = StyleSheet.create({
         paddingRight: 16,
         paddingBottom: 78,
         position: "relative",
+        overflow: "visible"
     },
     avatarInput: {
         width: 120,

@@ -1,15 +1,24 @@
-
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Image, Text, View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { useEffect, useState } from "react";
+import { Image, Text, View, StyleSheet } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import BGMainScreen from "../../Components/BGMainScren/BGMainScreen";
 import PostPreviewItem from "../../Components/PostsComponents/PostPreviewItem";
 
+import { posts as fakePosts, user } from '../../data'
 
-import { posts, user } from '../../data'
+const PostScreen = ({ navigation, route }) => {
+    const [posts, setPosts] = useState(fakePosts)
 
-const PostScreen = ({ navigation }) => {
+    useEffect(() => {
+        if (route.params) {
+            setPosts(prevState => ([...prevState, route.params.createFormData]))
+        }
+    }, [route.params])
+
+    // for flatlist's style
     const height = useBottomTabBarHeight();
-    const paddingHeight = 32;
+    const userWrapperMargins = 48;
     return (
         <BGMainScreen>
             <View style={styles.container}>
@@ -22,18 +31,12 @@ const PostScreen = ({ navigation }) => {
                         <Text style={styles.email}>{user.email}</Text>
                     </View>
                 </View>
-                <ScrollView>
-                    <View style={{ paddingBottom: height + paddingHeight, }}>
-                        {posts.map((post, i) =>
-                            <TouchableOpacity key={i} onPress={() => {
-                                navigation.navigate("Comments", { post: post })
-                            }}>
-                                <PostPreviewItem post={post} isHiddenLikes={true} />
-                            </TouchableOpacity>
-
-                        )}
-                    </View>
-                </ScrollView>
+                <FlatList
+                    data={posts}
+                    renderItem={({ item }) => <PostPreviewItem post={item} isHiddenLikes={true} navigation={navigation} />}
+                    keyExtractor={(item, i) => i}
+                    style={{ marginBottom: height + userWrapperMargins, }}
+                />
             </View>
         </ BGMainScreen>
     );
@@ -49,13 +52,15 @@ const styles = StyleSheet.create({
         marginTop: 32,
         // paddingHorizontal: 16,
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        marginBottom: 16,
+
     },
     secondColumn: {
         marginLeft: 8
     },
     name: {
-        // fontFamily: 'Roboto',
+        fontFamily: 'Roboto-Medium',
         fontStyle: "normal",
         fontWeight: "700",
         fontSize: 13,
@@ -64,7 +69,7 @@ const styles = StyleSheet.create({
         color: "#212121",
     },
     email: {
-        // fontFamily: 'Roboto',s
+        fontFamily: 'Roboto-Medium',
         fontStyle: "normal",
         fontWeight: "400",
         fontSize: 11,
@@ -73,6 +78,6 @@ const styles = StyleSheet.create({
         color: "rgba(33, 33, 33, 0.8)",
     },
     posts: {
-        paddingBottom: 96,
+        paddingBottom: 112,
     },
 })

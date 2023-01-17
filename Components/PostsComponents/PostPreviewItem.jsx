@@ -1,14 +1,20 @@
-import { Image, View, Text, StyleSheet } from "react-native";
+import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
-import { TouchableOpacity } from "react-native-gesture-handler";
 
-const PostPreviewItem = ({ post: { name, photo, comments, likes, location }, isHiddenLikes }) => {
+const PostPreviewItem = ({ post: { name, photo, comments, likes, location }, post, isHiddenLikes, navigation }) => {
     const colorCommentsIcon = comments.length ? "#FF6C00" : "#BDBDBD"
     const colorLikesIcon = comments.length ? "#FF6C00" : "#BDBDBD"
+
+    const photoSrc = typeof photo === "number" ? photo : { uri: photo }
     return (
+
         <View style={styles.container}>
-            <Image source={photo} style={styles.img} />
+            <TouchableOpacity onPress={() => {
+                navigation.navigate("Comments", { post: post })
+            }}>
+                <Image source={photoSrc} style={styles.img} />
+            </TouchableOpacity>
             <Text style={styles.title}>{name}</Text>
             <View style={styles.bottomDescription}>
                 <View style={{ flexDirection: "row", }}>
@@ -23,10 +29,14 @@ const PostPreviewItem = ({ post: { name, photo, comments, likes, location }, isH
 
                 </View>
 
-                <View style={{ ...styles.bottomItem, marginRight: 0 }}>
-                    <Feather name="map-pin" size={24} color={"#BDBDBD"} />
-                    <Text style={{ ...styles.text, textDecorationLine: "underline" }}>{location}</Text>
-                </View>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate("MapScreen", { post })
+                }}>
+                    <View style={{ ...styles.bottomItem, marginRight: 0 }}>
+                        <Feather name="map-pin" size={24} color={"#BDBDBD"} />
+                        <Text style={{ ...styles.text, textDecorationLine: "underline" }}>{location}</Text>
+                    </View>
+                </TouchableOpacity>
 
 
 
@@ -46,7 +56,8 @@ const styles = StyleSheet.create({
     },
     img: {
         borderRadius: 8,
-        width: "100%"
+        minWidth: "100%",
+        minHeight: 240,
     }
     ,
     title: {

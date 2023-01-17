@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
 import {
     StyleSheet,
     Text,
     View,
-    Keyboard,
-    TouchableWithoutFeedback,
     ScrollView,
-    SafeAreaView,
     TouchableOpacity
 } from "react-native";
 import Avatar from "../../Components/Avatar/Avatar";
@@ -19,20 +15,14 @@ import { posts, user } from "../../data";
 export default function ProfileScreen({ navigation }) {
     return (
         <View style={styles.container}>
-
             <BGAuthScreen>
-
                 <ScrollView>
                     <View
-                        style={{
-                            ...styles.screen,
-                        }}
+                        style={styles.screen}
                     >
                         <Avatar isEmplty={false} />
                         <BtnLogOut style={styles.BtnLogOut} />
                         <Text style={styles.title}>{user.name}</Text>
-
-
 
                         <View>
                             {posts.map((post, i) =>
