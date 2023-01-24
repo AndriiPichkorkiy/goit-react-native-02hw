@@ -3,7 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import * as Font from "expo-font";
 
 import { NavigationContainer } from "@react-navigation/native";
-import { useRoute } from "./route/useRoute";
+
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+import Main from "./Components/Main";
 
 const loadApplication = async () => {
   await Font.loadAsync({
@@ -13,8 +16,6 @@ const loadApplication = async () => {
 };
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(false);
-
   // async load font
   const [appIsReady, setAppIsReady] = useState(false);
 
@@ -44,10 +45,11 @@ export default function App() {
     return null;
   }
 
-  const route = useRoute(isAuth, setIsAuth);
   return (
-    <NavigationContainer onLayout={onLayoutRootView}>
-      {route}
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer onLayout={onLayoutRootView}>
+        <Main />
+      </NavigationContainer>
+    </Provider>
   );
 }

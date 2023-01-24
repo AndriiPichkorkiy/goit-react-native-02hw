@@ -2,7 +2,8 @@ import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
 
-const PostPreviewItem = ({ post: { name, photo, comments, likes, location }, post, isHiddenLikes, navigation }) => {
+const PostPreviewItem = ({ post: { name, photo, comments, likes, location, postId }, post, isHiddenLikes, navigation }) => {
+    console.log(name, photo, comments, likes, location, postId)
     const colorCommentsIcon = comments.length ? "#FF6C00" : "#BDBDBD"
     const colorLikesIcon = comments.length ? "#FF6C00" : "#BDBDBD"
 

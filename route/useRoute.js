@@ -4,6 +4,7 @@ import ProfileScreen from "../Screens/MainScreens/ProfileScreen.jsx";
 
 import LoginScreen from "../Screens/AuthScreens/LoginScreen";
 import RegistrationScreen from "../Screens/AuthScreens/RegistrationScreen";
+import AvatarScreen from "../Screens/AuthScreens/AvatarScreen";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
@@ -18,13 +19,14 @@ import BackBtn from "../Components/BackBtn/BackBtn";
 import CommentsScreen from "../Screens/PostsScreens/CommentsScreen";
 import MapScreen from "../Screens/PostsScreens/MapScreen";
 
+const AuthStack = createNativeStackNavigator();
 const Stack = createNativeStackNavigator();
 const MainStack = createNativeStackNavigator();
 const MainTab = createBottomTabNavigator();
 
-export const useRoute = (isAuth, setIsAuth) => {
+export const useRoute = (isAuth) => {
   if (!isAuth) {
-    return (
+    const AuthTabs = () => (
       <Stack.Navigator>
         <Stack.Screen
           options={{
@@ -39,9 +41,27 @@ export const useRoute = (isAuth, setIsAuth) => {
           }}
           name="Login"
         >
-          {(props) => <LoginScreen {...props} setIsAuth={setIsAuth} />}
+          {(props) => <LoginScreen {...props} />}
         </Stack.Screen>
       </Stack.Navigator>
+    );
+    return (
+      <AuthStack.Navigator>
+        <AuthStack.Screen
+          name="AuthTabs"
+          component={AuthTabs}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <AuthStack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="TakeAvatarScreen"
+          component={AvatarScreen}
+        />
+      </AuthStack.Navigator>
     );
   }
 

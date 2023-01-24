@@ -1,9 +1,10 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { user } from '../../data'
 
-const Avatar = ({ isEmplty }) => {
+const Avatar = ({ isEmplty, navigation }) => {
     const chooseAvatar = () => {
         console.log("CLICK chooseAvatar");
+        navigation.navigate("TakeAvatarScreen")
     };
 
     const avatar = isEmplty ? null : <Image source={user.avatar} style={styles.avatarImg} />

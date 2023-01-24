@@ -1,4 +1,6 @@
-export const getDateString = (date) => {
+export const getDateString = (dateString) => {
+  console.log(typeof +dateString);
+  const date = new Date(+dateString);
   const day = (date.getDay() + "").padStart(2, "0");
   const months = getMonth(date.getUTCMonth());
   const year = date.getFullYear();

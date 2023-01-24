@@ -4,17 +4,38 @@ import { Image, Text, View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import BGMainScreen from "../../Components/BGMainScren/BGMainScreen";
 import PostPreviewItem from "../../Components/PostsComponents/PostPreviewItem";
+import { collection, getDocs, } from "firebase/firestore";
+import { dbFirestore } from "../../firebase/config";
 
-import { posts as fakePosts, user } from '../../data'
+import { user } from '../../data'
 
 const PostScreen = ({ navigation, route }) => {
-    const [posts, setPosts] = useState(fakePosts)
+    const [posts, setPosts] = useState([])
 
     useEffect(() => {
-        if (route.params) {
-            setPosts(prevState => ([...prevState, route.params.createFormData]))
+        const getCollection = async () => {
+            const querySnapshot = await getDocs(collection(dbFirestore, "posts"));
+            // console.log('querySnapshot', querySnapshot)
+            const posts = querySnapshot.docs.map((doc) => ({ ...doc.data(), postId: doc.id }))
+            setPosts(posts)
+            // const promises = [];
+            // querySnapshot.forEach((shanpshot) => {
+            //     const refCollection = collection(dbFirestore, "comments")
+
+            //     promises.push(getDocs(refCollection))
+            // })
+            // const result = await Promise.all(promises)
+            // console.log(result)
+            querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log("doc => => => ", doc.data());
+            });
+            // querySnapshot.forEach((doc) => {
+            //     console.log(doc.id, " => ", doc.data());
+            // });
         }
-    }, [route.params])
+        getCollection();
+    }, [])
 
     // for flatlist's style
     const height = useBottomTabBarHeight();

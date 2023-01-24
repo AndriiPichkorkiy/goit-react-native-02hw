@@ -11,21 +11,31 @@ import { generalStyles } from "../../helpers/generalStyles";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 import * as ImagePicker from 'expo-image-picker';
+// import db from "../../firebase/config"
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, setDoc, getFirestore, collection, addDoc } from "firebase/firestore";
+import { dbFirestore } from "../../firebase/config";
+import { useSelector } from "react-redux";
 
 const initialState = {
     photo: null,
     name: null,
     location: null,
     coords: null,
-    comments: [],
+    comments: 0,
     likes: 0,
+    userId: null,
 }
 
 const CreateScreen = ({ navigation }) => {
     const [hasPermissionCamera, setHasPermissionCamera] = useState(null);
     const [hasPermissionLocation, setHasPermissionLocation] = useState(null);
     const [camera, setCamera] = useState(null)
-    const [formData, setFormData] = useState(initialState)
+    const { userId } = useSelector((state) => state.auth)
+    // console.log('userId', userId)
+    const [formData, setFormData] = useState({ ...initialState, userId })
+    // console.log('formData', formData)
+
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,7 +46,7 @@ const CreateScreen = ({ navigation }) => {
         });
 
         if (!result.canceled) {
-            setImageToFormData(result.assets[0].uri)
+            setImageToFormData(result.assets[0])
         }
     };
 
@@ -50,7 +60,8 @@ const CreateScreen = ({ navigation }) => {
     const setImageToFormData = async (img) => {
         let coords;
         if (hasPermissionLocation) {
-            const location = await Location.getLastKnownPositionAsync();
+            const location = await Location.getLastKnownPositionAsync() || await Location.getCurrentPositionAsync();
+            // console.log(location)
             coords = {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
@@ -58,8 +69,9 @@ const CreateScreen = ({ navigation }) => {
         } else {
             console.warn("NO PERMISSION!!!")
         }
-        console.log(`coords `, coords)
+        // console.log(`coords `, coords)
         setFormData(prevState => ({ ...prevState, photo: img.uri, coords }))
+
     }
 
     const inputHadlerName = (value) => {
@@ -69,9 +81,46 @@ const CreateScreen = ({ navigation }) => {
         setFormData(prevState => ({ ...prevState, location: value }))
     }
 
-    const submitPost = () => {
+    const submitPost = async () => {
         navigation.navigate("Posts", { createFormData: { ...formData } })
-        setFormData(initialState)
+        const photoAdress = await uploadPhotoToServer()
+        // console.log(photoAdress)
+        try {
+            const response = await addDoc(collection(dbFirestore, "posts"), { ...formData, photo: photoAdress });
+            console.log('response', response)
+        } catch (error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(`errorCode: ${errorCode}, errorMessage: ${errorMessage}`);
+        }
+
+        // setFormData({ ...initialState })
+    }
+
+    const uploadPhotoToServer = async () => {
+        const response = await fetch(formData.photo)
+        // console.log('response', response)
+        const file = await response.blob()
+        // console.log('file', file)
+        const uniquePostId = Date.now().toString() + ((Math.random() + "").slice(2));
+        // console.log('uniquePostId', uniquePostId)
+
+        const storage = getStorage();
+        const storageRef = ref(storage, `postImage/${uniquePostId}`);
+
+        console.log('storageRef', storageRef)
+        try {
+            const data = await uploadBytes(storageRef, file)
+            // console.log(`data: `, data)
+            const adress = await getDownloadURL(ref(storage, `postImage/${uniquePostId}`))
+            // console.log("adress: ", adress)
+            return adress
+        } catch (error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(`errorCode: ${errorCode}, errorMessage: ${errorMessage}`);
+        }
+
     }
 
     const keyboardHide = () => {
@@ -116,13 +165,6 @@ const CreateScreen = ({ navigation }) => {
         })();
     }, []);
 
-    useEffect(() => {
-        (async () => {
-
-
-        })();
-    }, []);
-
     if (hasPermissionCamera === null) {
         return <Text>Waiting permission</Text>;
     }
@@ -151,8 +193,6 @@ const CreateScreen = ({ navigation }) => {
                                         {formData.photo && <Image
                                             style={styles.photo}
                                             source={{ uri: formData.photo }}
-                                        // source={anotherUser}
-
                                         />}
                                         <TouchableOpacity onPress={takePhoto} style={styles.snapContainer} >
                                             <View style={styles.photoIconWrapper}>

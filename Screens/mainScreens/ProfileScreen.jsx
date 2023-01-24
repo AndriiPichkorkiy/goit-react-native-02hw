@@ -9,10 +9,40 @@ import Avatar from "../../Components/Avatar/Avatar";
 import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
 import BtnLogOut from "../../Components/BtnLogOut/BtnLogOut";
 import PostPreviewItem from "../../Components/PostsComponents/PostPreviewItem";
-import { posts, user } from "../../data";
+
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { dbFirestore } from "../../firebase/config";
+
+import { user } from "../../data";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 
 export default function ProfileScreen({ navigation }) {
+    console.log('navigation', navigation)
+
+    const [posts, setPosts] = useState([])
+    const { userId } = useSelector((state) => state.auth)
+
+    useEffect(() => {
+        const getCollection = async () => {
+            const q = query(collection(dbFirestore, "posts"), where("userId", "==", userId));
+
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+            });
+
+
+
+            const posts = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            setPosts(posts)
+        }
+        getCollection();
+    }, [])
+
     return (
         <View style={styles.container}>
             <BGAuthScreen>
@@ -26,11 +56,7 @@ export default function ProfileScreen({ navigation }) {
 
                         <View>
                             {posts.map((post, i) =>
-                                <TouchableOpacity key={i} onPress={() => {
-                                    navigation.navigate("Comments", { post: post })
-                                }}>
-                                    <PostPreviewItem post={post} />
-                                </TouchableOpacity>
+                                <PostPreviewItem post={post} navigation={navigation} />
 
                             )}
                         </View>

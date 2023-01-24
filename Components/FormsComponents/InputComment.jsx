@@ -4,25 +4,21 @@ import { TouchableOpacity } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { generalStyles } from "../../helpers/generalStyles"
 
-const InputComment = () => {
-    const [message, setMessage] = useState("")
-
-    const btnBGColor = message ? generalStyles.activeBG : generalStyles.disableBG
-    const btnIconColor = message ? generalStyles.activeColor : generalStyles.disableColor
+const InputComment = ({ onChangeText, value, onSubmit }) => {
+    const btnBGColor = value ? generalStyles.activeBG : generalStyles.disableBG
+    const btnIconColor = value ? generalStyles.activeColor : generalStyles.disableColor
     return (
         <View style={styles.inputWrapper}>
             <TextInput
-                value={message}
-                onChangeText={(value) =>
-                    setMessage(value)
-                }
+                value={value}
+                onChangeText={onChangeText}
                 placeholder="Коментувати..."
                 placeholderTextColor="#BDBDBD"
                 style={styles.input}
                 multiline
             />
             <View style={styles.subbmitBtnWrapper}>
-                <TouchableOpacity style={{ ...styles.subbmitBtn, backgroundColor: btnBGColor }}>
+                <TouchableOpacity style={{ ...styles.subbmitBtn, backgroundColor: btnBGColor }} onPress={onSubmit}>
                     <AntDesign name="arrowup" size={24} color={btnIconColor} />
                 </TouchableOpacity>
             </View>

@@ -13,15 +13,19 @@ import {
 } from "react-native";
 import InputPassword from "../../Components/FormsComponents/InputPassword";
 import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
+import { useDispatch } from "react-redux";
+import { authSingInUser } from "../../redux/auth/authOperations";
 
 const initialState = {
     email: "",
     password: "",
 };
 
-export default function LoginScreen({ setIsAuth, navigation }) {
+export default function LoginScreen({ navigation }) {
     const [isShowKeyboard, setIsShowKeyboard] = useState(false);
     const [state, setState] = useState(initialState);
+
+    const dispatch = useDispatch()
 
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener(
@@ -49,10 +53,11 @@ export default function LoginScreen({ setIsAuth, navigation }) {
     };
 
     const submiteForm = () => {
-        setState(initialState);
+        dispatch(authSingInUser(state))
+
         keyboardHide();
-        console.log("Данні з форми Login: ", state)
-        setIsAuth(true)
+        // console.log("Данні з форми Login: ", state)
+        setState(initialState);
     };
 
     const switchPage = () => {

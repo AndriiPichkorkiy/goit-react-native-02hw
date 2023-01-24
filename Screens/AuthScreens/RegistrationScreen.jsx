@@ -15,6 +15,8 @@ import {
 import InputPassword from "../../Components/FormsComponents/InputPassword";
 import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
 import Avatar from "../../Components/Avatar/Avatar";
+import { authSingUpUser } from "../../redux/auth/authOperations";
+import { useDispatch } from "react-redux";
 
 const initialState = {
     login: "",
@@ -22,12 +24,11 @@ const initialState = {
     password: "",
 };
 
-// const window = Dimensions.get("window");
-// const screen = Dimensions.get("screen");
-
 export default function RegistrationScreen({ navigation }) {
     const [isShowKeyboard, setIsShowKeyboard] = useState(false);
     const [state, setState] = useState(initialState);
+
+    const dispath = useDispatch();
 
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener(
@@ -55,17 +56,16 @@ export default function RegistrationScreen({ navigation }) {
     };
 
     const submiteForm = () => {
-        setState(initialState);
+        dispath(authSingUpUser(state))
+
         keyboardHide();
         console.log("Данні з форми Registration: ", state)
+        setState(initialState);
         navigation.navigate("Login")
     };
 
     const switchPage = () => {
         navigation.navigate("Login");
-    };
-    const chooseAvatar = () => {
-        console.log("CLICK chooseAvatar");
     };
 
     return (
@@ -82,16 +82,8 @@ export default function RegistrationScreen({ navigation }) {
                                 paddingBottom: isShowKeyboard ? 20 : 100,
                             }}
                         >
-                            <Avatar isEmplty={true} />
-                            {/* <View style={styles.avatarInput}>
-                                <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={chooseAvatar}
-                                    style={styles.avatarInputBtn}
-                                >
-                                    <Text style={styles.avatarInputBtnText}>+</Text>
-                                </TouchableOpacity>
-                            </View> */}
+                            <Avatar isEmplty={true} navigation={navigation} />
+
                             <Text style={styles.title}>Реєстрація</Text>
                             <TextInput
                                 style={styles.input}

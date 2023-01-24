@@ -1,22 +1,31 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import { getDateString } from "../../helpers/getDateString";
 
+import noAvatarImg from "../../assets/images/minion.png";
+import { useSelector } from "react-redux";
+
 const Comment = ({ comment }) => {
+    console.log(comment)
+    const { userId } = useSelector((state) => state.auth)
+    const isOwnComment = userId === comment.userId;
     const date = getDateString(comment.dateset)
-    const styleContainer = comment.isOwn
+    const styleContainer = isOwnComment
         ? { ...styles.container, flexDirection: "row-reverse" }
         : styles.container
-    const styleComment = comment.isOwn
+    const styleComment = isOwnComment
         ? ownComment
         : anotherComment
-    const styleCommentDate = comment.isOwn
+    const styleCommentDate = isOwnComment
         ? ownCommentDate
         : anotherCommentDate
+
+    const avatar = comment.avatar ? comment.avatar : noAvatarImg
+
     return (
         <View style={styleContainer}>
-            <Image source={comment.avatar} style={styles.avatar} />
+            <Image source={avatar} style={styles.avatar} />
             <View style={styleComment}>
-                <Text style={styles.text}>{comment.text}</Text>
+                <Text style={styles.text}>{comment.comment}</Text>
                 <Text style={styleCommentDate}>{date}</Text>
             </View>
         </View>
