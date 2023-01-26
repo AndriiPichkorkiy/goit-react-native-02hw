@@ -3,9 +3,8 @@ import { Feather } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
 
 const PostPreviewItem = ({ post: { name, photo, comments, likes, location, postId }, post, isHiddenLikes, navigation }) => {
-    console.log(name, photo, comments, likes, location, postId)
-    const colorCommentsIcon = comments.length ? "#FF6C00" : "#BDBDBD"
-    const colorLikesIcon = comments.length ? "#FF6C00" : "#BDBDBD"
+    const colorCommentsIcon = comments ? "#FF6C00" : "#BDBDBD"
+    const colorLikesIcon = likes ? "#FF6C00" : "#BDBDBD"
 
     const photoSrc = typeof photo === "number" ? photo : { uri: photo }
     return (
@@ -21,7 +20,7 @@ const PostPreviewItem = ({ post: { name, photo, comments, likes, location, postI
                 <View style={{ flexDirection: "row", }}>
                     <View style={styles.bottomItem}>
                         <Feather name="message-circle" size={24} color={colorCommentsIcon} style={styles.msgIcon} />
-                        <Text style={styles.text}>{comments.length}</Text>
+                        <Text style={styles.text}>{comments}</Text>
                     </View>
                     {!isHiddenLikes && <View style={styles.bottomItem}>
                         <EvilIcons name="like" size={32} color={colorLikesIcon} />

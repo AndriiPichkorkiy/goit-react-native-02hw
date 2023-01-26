@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     StyleSheet,
     Text,
@@ -10,6 +10,7 @@ import {
     Keyboard,
     TouchableWithoutFeedback,
     Dimensions,
+    Button,
 } from "react-native";
 
 import InputPassword from "../../Components/FormsComponents/InputPassword";
@@ -17,6 +18,8 @@ import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
 import Avatar from "../../Components/Avatar/Avatar";
 import { authSingUpUser } from "../../redux/auth/authOperations";
 import { useDispatch } from "react-redux";
+import SubmitBtn from "../../Components/FormsComponents/SubmitBtn";
+
 
 const initialState = {
     login: "",
@@ -59,74 +62,70 @@ export default function RegistrationScreen({ navigation }) {
         dispath(authSingUpUser(state))
 
         keyboardHide();
-        console.log("Данні з форми Registration: ", state)
-        setState(initialState);
-        navigation.navigate("Login")
+        // setState(initialState);
     };
 
-    const switchPage = () => {
-        navigation.navigate("Login");
-    };
+    const switchPage = () => navigation.navigate("Login");
 
+    const isEnabledSubmit = !!(state.login && state.password && state.email)
     return (
-        <TouchableWithoutFeedback onPress={keyboardHide}>
-            <View style={styles.container}>
-                <BGAuthScreen>
-                    <KeyboardAvoidingView
-                        style={{ flex: 1, justifyContent: "flex-end" }}
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    >
-                        <View
-                            style={{
-                                ...styles.form,
-                                paddingBottom: isShowKeyboard ? 20 : 100,
-                            }}
+        <>
+            <TouchableWithoutFeedback onPress={keyboardHide}>
+
+                <View style={styles.container}>
+
+                    <BGAuthScreen>
+                        <KeyboardAvoidingView
+                            style={{ flex: 1, justifyContent: "flex-end" }}
+                            behavior={Platform.OS === "ios" ? "padding" : "height"}
                         >
-                            <Avatar isEmplty={true} navigation={navigation} />
-
-                            <Text style={styles.title}>Реєстрація</Text>
-                            <TextInput
-                                style={styles.input}
-                                onFocus={() => setIsShowKeyboard(true)}
-                                onChangeText={(value) =>
-                                    setState((prevState) => ({ ...prevState, login: value }))
-                                }
-                                value={state.login}
-                                placeholder="Логін"
-                            />
-                            <TextInput
-                                style={styles.input}
-
-                                onFocus={() => setIsShowKeyboard(true)}
-                                onChangeText={(value) =>
-                                    setState((prevState) => ({ ...prevState, email: value }))
-                                }
-                                value={state.email}
-                                placeholder="Адреса електронної скриньки"
-                            />
-                            <InputPassword style={styles.input}
-                                onFocus={() => setIsShowKeyboard(true)}
-                                onChangeText={(value) =>
-                                    setState((prevState) => ({ ...prevState, password: value }))
-                                }
-                                value={state.password}
-                            />
-                            <TouchableOpacity
-                                activeOpacity={0.7}
-                                style={styles.formBtn}
-                                onPress={submiteForm}
+                            <View
+                                style={{
+                                    ...styles.form,
+                                    paddingBottom: isShowKeyboard ? 20 : 100,
+                                }}
                             >
-                                <Text style={styles.formBtnText}>Зареєструватися</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity activeOpacity={0.7} onPress={switchPage}>
-                                <Text style={styles.switcherPage}>Вже є аккаунт? Увійти</Text>
-                            </TouchableOpacity>
+                                <Avatar isEmplty={true} navigation={navigation} isRegestration={true} />
 
-                        </View>
-                    </KeyboardAvoidingView>
-                </BGAuthScreen>
-            </View>
-        </TouchableWithoutFeedback >
+                                <Text style={styles.title}>Реєстрація</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onFocus={() => setIsShowKeyboard(true)}
+                                    onChangeText={(value) =>
+                                        setState((prevState) => ({ ...prevState, login: value }))
+                                    }
+                                    value={state.login}
+                                    placeholder="Логін"
+                                />
+                                <TextInput
+                                    style={styles.input}
+
+                                    onFocus={() => setIsShowKeyboard(true)}
+                                    onChangeText={(value) =>
+                                        setState((prevState) => ({ ...prevState, email: value }))
+                                    }
+                                    value={state.email}
+                                    placeholder="Адреса електронної скриньки"
+                                />
+                                <InputPassword style={styles.input}
+                                    onFocus={() => setIsShowKeyboard(true)}
+                                    onChangeText={(value) =>
+                                        setState((prevState) => ({ ...prevState, password: value }))
+                                    }
+                                    value={state.password}
+                                />
+                                <SubmitBtn title="Зареєструватися" onPress={submiteForm} isEnable={isEnabledSubmit} />
+                                <TouchableOpacity activeOpacity={0.7} onPress={switchPage}>
+                                    <Text style={styles.switcherPage}>Вже є аккаунт? Увійти</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        </KeyboardAvoidingView>
+                    </BGAuthScreen>
+                </View>
+            </TouchableWithoutFeedback >
+
+        </>
     );
 }
 
@@ -200,24 +199,24 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
 
-    formBtn: {
-        marginTop: 43,
-        alignItems: "center",
-        padding: 32,
-        paddingTop: 16,
-        paddingBottom: 16,
+    // formBtn: {
+    //     marginTop: 43,
+    //     alignItems: "center",
+    //     padding: 32,
+    //     paddingTop: 16,
+    //     paddingBottom: 16,
 
-        backgroundColor: "#FF6C00",
-        borderRadius: 100,
-    },
+    //     backgroundColor: "#FF6C00",
+    //     borderRadius: 100,
+    // },
 
-    formBtnText: {
-        fontFamily: "Roboto-Regular",
-        fontWeight: "400",
-        fontSize: 16,
-        lineHeight: 19,
-        color: "#FFFFFF",
-    },
+    // formBtnText: {
+    //     fontFamily: "Roboto-Regular",
+    //     fontWeight: "400",
+    //     fontSize: 16,
+    //     lineHeight: 19,
+    //     color: "#FFFFFF",
+    // },
 
     switcherPage: {
         paddingTop: 16,

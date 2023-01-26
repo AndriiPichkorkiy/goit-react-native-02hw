@@ -5,17 +5,18 @@ import { EvilIcons } from '@expo/vector-icons';
 import { TextInput } from "react-native-gesture-handler";
 import InputLocation from "../../Components/FormsComponents/InputLocation";
 import SubmitBtn from "../../Components/FormsComponents/SubmitBtn";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Camera } from "expo-camera";
 import { generalStyles } from "../../helpers/generalStyles";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 import * as ImagePicker from 'expo-image-picker';
-// import db from "../../firebase/config"
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, getFirestore, collection, addDoc } from "firebase/firestore";
 import { dbFirestore } from "../../firebase/config";
 import { useSelector } from "react-redux";
+import uploadPhotoToServer from "../../firebase/uploadPhotoToServer";
+
+import { useIsFocused } from '@react-navigation/native';
 
 const initialState = {
     photo: null,
@@ -24,18 +25,17 @@ const initialState = {
     coords: null,
     comments: 0,
     likes: 0,
-    userId: null,
+    userOwner: null,
 }
 
 const CreateScreen = ({ navigation }) => {
     const [hasPermissionCamera, setHasPermissionCamera] = useState(null);
     const [hasPermissionLocation, setHasPermissionLocation] = useState(null);
-    const [camera, setCamera] = useState(null)
-    const { userId } = useSelector((state) => state.auth)
-    // console.log('userId', userId)
-    const [formData, setFormData] = useState({ ...initialState, userId })
-    // console.log('formData', formData)
-
+    const isFocused = useIsFocused()
+    // const [camera, setCamera] = useState(null)
+    let camera;
+    const { userId, nickname, email, photoURL } = useSelector((state) => state.auth)
+    const [formData, setFormData] = useState({ ...initialState, userOwner: { userId, nickname, email, photoURL } })
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -53,7 +53,6 @@ const CreateScreen = ({ navigation }) => {
     const takePhoto = async () => {
         const photo = await camera.takePictureAsync();
         MediaLibrary.createAssetAsync(photo.uri);
-        console.log("Save")
         setImageToFormData(photo)
     }
 
@@ -61,7 +60,6 @@ const CreateScreen = ({ navigation }) => {
         let coords;
         if (hasPermissionLocation) {
             const location = await Location.getLastKnownPositionAsync() || await Location.getCurrentPositionAsync();
-            // console.log(location)
             coords = {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
@@ -69,7 +67,6 @@ const CreateScreen = ({ navigation }) => {
         } else {
             console.warn("NO PERMISSION!!!")
         }
-        // console.log(`coords `, coords)
         setFormData(prevState => ({ ...prevState, photo: img.uri, coords }))
 
     }
@@ -82,12 +79,11 @@ const CreateScreen = ({ navigation }) => {
     }
 
     const submitPost = async () => {
-        navigation.navigate("Posts", { createFormData: { ...formData } })
-        const photoAdress = await uploadPhotoToServer()
-        // console.log(photoAdress)
+
+        const photoAdress = await uploadPhotoToServer(formData.photo, "post")
         try {
-            const response = await addDoc(collection(dbFirestore, "posts"), { ...formData, photo: photoAdress });
-            console.log('response', response)
+            const response = await addDoc(collection(dbFirestore, "posts"), { ...formData, photo: photoAdress, dateset: Date.now().toString() });
+            navigation.navigate("Posts", { createFormData: { ...formData } })
         } catch (error) {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -95,32 +91,6 @@ const CreateScreen = ({ navigation }) => {
         }
 
         // setFormData({ ...initialState })
-    }
-
-    const uploadPhotoToServer = async () => {
-        const response = await fetch(formData.photo)
-        // console.log('response', response)
-        const file = await response.blob()
-        // console.log('file', file)
-        const uniquePostId = Date.now().toString() + ((Math.random() + "").slice(2));
-        // console.log('uniquePostId', uniquePostId)
-
-        const storage = getStorage();
-        const storageRef = ref(storage, `postImage/${uniquePostId}`);
-
-        console.log('storageRef', storageRef)
-        try {
-            const data = await uploadBytes(storageRef, file)
-            // console.log(`data: `, data)
-            const adress = await getDownloadURL(ref(storage, `postImage/${uniquePostId}`))
-            // console.log("adress: ", adress)
-            return adress
-        } catch (error) {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(`errorCode: ${errorCode}, errorMessage: ${errorMessage}`);
-        }
-
     }
 
     const keyboardHide = () => {
@@ -151,7 +121,7 @@ const CreateScreen = ({ navigation }) => {
         };
     }, []);
 
-    const isEnabledSubmit = formData.name && formData.photo && formData.location
+    const isEnabledSubmit = !!(formData.name && formData.photo && formData.location)
 
     useEffect(() => {
         (async () => {
@@ -189,7 +159,7 @@ const CreateScreen = ({ navigation }) => {
 
                             <View>
                                 <View  >
-                                    <Camera style={styles.photoWrapper} ref={setCamera}>
+                                    {isFocused && <Camera style={styles.photoWrapper} ref={ref => camera = ref}>
                                         {formData.photo && <Image
                                             style={styles.photo}
                                             source={{ uri: formData.photo }}
@@ -203,7 +173,7 @@ const CreateScreen = ({ navigation }) => {
                                             </View>
 
                                         </TouchableOpacity>
-                                    </Camera>
+                                    </Camera>}
                                 </View>
 
                                 <TouchableOpacity onPress={pickImage}>
@@ -313,7 +283,7 @@ const styles = StyleSheet.create({
         lineHeight: 19,
         paddingVertical: 16,
 
-        color: "#BDBDBD",
+        placeholderTextColor: "#BDBDBD",
 
         borderBottomColor: "#BDBDBD",
         borderBottomWidth: 1,

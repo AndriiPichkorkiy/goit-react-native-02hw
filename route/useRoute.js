@@ -56,7 +56,7 @@ export const useRoute = (isAuth) => {
         />
         <AuthStack.Screen
           options={{
-            headerShown: false,
+            headerShown: true,
           }}
           name="TakeAvatarScreen"
           component={AvatarScreen}
@@ -158,6 +158,14 @@ export const useRoute = (isAuth) => {
         }}
         name="MapScreen"
         component={MapScreen}
+      />
+      <MainStack.Screen
+        options={{
+          title: "Змінити Аватарку",
+          headerShown: true,
+        }}
+        name="TakeAvatarScreen"
+        component={AvatarScreen}
       />
     </MainStack.Navigator>
   );

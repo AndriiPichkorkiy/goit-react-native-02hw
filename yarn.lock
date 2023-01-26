@@ -6134,6 +6134,13 @@ react-native-maps@1.3.2:
   dependencies:
     "@types/geojson" "^7946.0.8"
 
+react-native-push-notification-popup@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-push-notification-popup/-/react-native-push-notification-popup-1.6.1.tgz#db662a5b7da93471389a97210131de00aa58f118"
+  integrity sha512-inbAOr4H9BH0jKHOgxX8qn90WrCVfcL8M7Zbji5o0RdUyAohGAGm5yb+8vfkgpt/qDu8Not7HPpei85mzbHGzg==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-reanimated@~2.12.0:
   version "2.12.0"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-2.12.0.tgz"

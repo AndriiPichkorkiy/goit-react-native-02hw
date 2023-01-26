@@ -1,13 +1,14 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { user } from '../../data'
+import { useSelector } from "react-redux";
 
-const Avatar = ({ isEmplty, navigation }) => {
+const Avatar = ({ isEmplty, navigation, isRegestration }) => {
     const chooseAvatar = () => {
-        console.log("CLICK chooseAvatar");
-        navigation.navigate("TakeAvatarScreen")
+        navigation.navigate("TakeAvatarScreen", { isRegestration: isRegestration })
     };
+    const { photoURL } = useSelector(state => state.auth)
 
-    const avatar = isEmplty ? null : <Image source={user.avatar} style={styles.avatarImg} />
+    const avatar = <Image source={{ uri: photoURL }} style={styles.avatarImg} />
+
     const addBtn = isEmplty ? <Text style={styles.avatarInputBtnTextEmpty}>+</Text> : <Text style={{ ...styles.avatarInputBtnTextEmpty, ...styles.avatarInputBtnText }}>+</Text>
 
     return (
@@ -36,13 +37,13 @@ const styles = StyleSheet.create({
         position: "absolute",
         left: "50%",
         transform: [{ translateX: -50 }, { translateY: -50 }],
-        // overflow: "hidden"
     },
     avatarImg: {
         width: "100%",
         height: "100%",
         overflow: "hidden",
         borderRadius: 16,
+        resizeMode: "contain"
     },
     avatarInputBtn: {
         position: "absolute",
@@ -53,7 +54,6 @@ const styles = StyleSheet.create({
         borderColor: "#FF6C00",
         borderWidth: 2,
 
-        // transform: [{ translateX: 50 }],
         right: -12.5,
         bottom: 20,
     },

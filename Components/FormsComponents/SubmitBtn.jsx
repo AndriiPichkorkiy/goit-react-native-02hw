@@ -5,14 +5,12 @@ import { generalStyles } from "../../helpers/generalStyles"
 const SubmitBtn = ({ onPress, title, isEnable }) => {
     const styleBtn = isEnable ? styles.formBtn : { ...styles.formBtn, ...styles.formBtnDisable }
     const styleBtnText = isEnable ? styles.formBtnText : { ...styles.formBtnText, ...styles.formBtnTextDisable }
-    // const styleBtn = styles.formBtn
-    // const styleBtnText = styles.formBtnText
-
     return (
         <TouchableOpacity
             activeOpacity={0.7}
             style={styleBtn}
             onPress={onPress}
+            disabled={!isEnable}
         >
             <Text style={styleBtnText}>{title}</Text>
         </TouchableOpacity>

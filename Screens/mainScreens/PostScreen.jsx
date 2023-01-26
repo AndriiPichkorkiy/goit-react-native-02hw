@@ -4,37 +4,24 @@ import { Image, Text, View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import BGMainScreen from "../../Components/BGMainScren/BGMainScreen";
 import PostPreviewItem from "../../Components/PostsComponents/PostPreviewItem";
-import { collection, getDocs, } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, query, } from "firebase/firestore";
 import { dbFirestore } from "../../firebase/config";
 
-import { user } from '../../data'
+import PostCard from "../../Components/PostsComponents/PostCard";
 
 const PostScreen = ({ navigation, route }) => {
     const [posts, setPosts] = useState([])
 
     useEffect(() => {
-        const getCollection = async () => {
-            const querySnapshot = await getDocs(collection(dbFirestore, "posts"));
-            // console.log('querySnapshot', querySnapshot)
-            const posts = querySnapshot.docs.map((doc) => ({ ...doc.data(), postId: doc.id }))
-            setPosts(posts)
-            // const promises = [];
-            // querySnapshot.forEach((shanpshot) => {
-            //     const refCollection = collection(dbFirestore, "comments")
-
-            //     promises.push(getDocs(refCollection))
-            // })
-            // const result = await Promise.all(promises)
-            // console.log(result)
+        const q = query(collection(dbFirestore, "posts"));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const allposts = [];
             querySnapshot.forEach((doc) => {
-                // doc.data() is never undefined for query doc snapshots
-                console.log("doc => => => ", doc.data());
+                allposts.push({ ...doc.data(), postId: doc.id });
             });
-            // querySnapshot.forEach((doc) => {
-            //     console.log(doc.id, " => ", doc.data());
-            // });
-        }
-        getCollection();
+            allposts.sort((a, b) => a.dateset - b.dateset)
+            setPosts(allposts)
+        });
     }, [])
 
     // for flatlist's style
@@ -43,20 +30,12 @@ const PostScreen = ({ navigation, route }) => {
     return (
         <BGMainScreen>
             <View style={styles.container}>
-                <View style={styles.userWrapper}>
-                    <View>
-                        <Image source={user.avatar} />
-                    </View>
-                    <View style={styles.secondColumn}>
-                        <Text style={styles.name}>{user.name}</Text>
-                        <Text style={styles.email}>{user.email}</Text>
-                    </View>
-                </View>
                 <FlatList
                     data={posts}
-                    renderItem={({ item }) => <PostPreviewItem post={item} isHiddenLikes={true} navigation={navigation} />}
+                    renderItem={({ item }) => <PostCard post={item} isHiddenLikes={true} navigation={navigation} />}
+                    // renderItem={({ item }) => <PostPreviewItem post={item} isHiddenLikes={true} navigation={navigation} />}
                     keyExtractor={(item, i) => i}
-                    style={{ marginBottom: height + userWrapperMargins, }}
+                    style={{ marginBottom: 0 }}
                 />
             </View>
         </ BGMainScreen>
@@ -71,7 +50,6 @@ const styles = StyleSheet.create({
     },
     userWrapper: {
         marginTop: 32,
-        // paddingHorizontal: 16,
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 16,

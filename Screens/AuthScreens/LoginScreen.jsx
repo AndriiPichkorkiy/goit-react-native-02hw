@@ -15,6 +15,7 @@ import InputPassword from "../../Components/FormsComponents/InputPassword";
 import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
 import { useDispatch } from "react-redux";
 import { authSingInUser } from "../../redux/auth/authOperations";
+import SubmitBtn from "../../Components/FormsComponents/SubmitBtn";
 
 const initialState = {
     email: "",
@@ -56,7 +57,6 @@ export default function LoginScreen({ navigation }) {
         dispatch(authSingInUser(state))
 
         keyboardHide();
-        // console.log("Данні з форми Login: ", state)
         setState(initialState);
     };
 
@@ -64,6 +64,7 @@ export default function LoginScreen({ navigation }) {
         navigation.navigate("Registration");
     };
 
+    const isEnabledSubmit = state.password && state.email
     return (
         <TouchableWithoutFeedback onPress={keyboardHide}>
             <View style={styles.container}>
@@ -100,13 +101,14 @@ export default function LoginScreen({ navigation }) {
 
 
                             />
-                            <TouchableOpacity
+                            {/* <TouchableOpacity
                                 activeOpacity={0.7}
                                 style={styles.formBtn}
                                 onPress={submiteForm}
                             >
                                 <Text style={styles.formBtnText}>Війти</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
+                            <SubmitBtn title="Війти" onPress={submiteForm} isEnable={isEnabledSubmit} />
                             <TouchableOpacity activeOpacity={0.7} onPress={switchPage}>
                                 <Text style={styles.switcherPage}>Немає акаунта? Зареєструватися</Text>
                             </TouchableOpacity>

@@ -3,69 +3,57 @@ import {
     Text,
     View,
     ScrollView,
-    TouchableOpacity
+    TouchableOpacity,
+    FlatList
 } from "react-native";
 import Avatar from "../../Components/Avatar/Avatar";
 import BGAuthScreen from "../../Components/BGAuthScreen/BGAuthScreen";
 import BtnLogOut from "../../Components/BtnLogOut/BtnLogOut";
 import PostPreviewItem from "../../Components/PostsComponents/PostPreviewItem";
 
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { dbFirestore } from "../../firebase/config";
 
-import { user } from "../../data";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import PostCard from "../../Components/PostsComponents/PostCard";
 
 
 export default function ProfileScreen({ navigation }) {
-    console.log('navigation', navigation)
 
     const [posts, setPosts] = useState([])
-    const { userId } = useSelector((state) => state.auth)
-
+    const { userId, nickname } = useSelector((state) => state.auth)
     useEffect(() => {
-        const getCollection = async () => {
-            const q = query(collection(dbFirestore, "posts"), where("userId", "==", userId));
-
-            const querySnapshot = await getDocs(q);
-
+        const q = query(collection(dbFirestore, "posts",), where("userOwner.userId", "==", userId));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const allposts = [];
             querySnapshot.forEach((doc) => {
-                // doc.data() is never undefined for query doc snapshots
-                console.log(doc.id, " => ", doc.data());
+                allposts.push({ ...doc.data(), postId: doc.id });
             });
-
-
-
-            const posts = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-            setPosts(posts)
-        }
-        getCollection();
+            allposts.sort((a, b) => a.dateset - b.dateset)
+            setPosts(allposts)
+        });
     }, [])
 
     return (
         <View style={styles.container}>
             <BGAuthScreen>
-                <ScrollView>
-                    <View
-                        style={styles.screen}
-                    >
-                        <Avatar isEmplty={false} />
-                        <BtnLogOut style={styles.BtnLogOut} />
-                        <Text style={styles.title}>{user.name}</Text>
-
-                        <View>
-                            {posts.map((post, i) =>
-                                <PostPreviewItem post={post} navigation={navigation} />
-
-                            )}
-                        </View>
+                <View
+                    style={styles.screen}
+                >
+                    <Avatar isEmplty={false} navigation={navigation} />
+                    <BtnLogOut style={styles.BtnLogOut} />
+                    <Text style={styles.title}>{nickname}</Text>
 
 
-                    </View>
-                </ScrollView>
+                    < FlatList
+                        data={posts}
+                        renderItem={({ item }) => <PostCard post={item} isHiddenLikes={false} navigation={navigation} />}
 
-
+                        keyExtractor={(item, i) => i}
+                        style={{ marginBottom: 0 }}
+                    />
+                </View>
             </BGAuthScreen>
         </View>
     );
@@ -74,12 +62,10 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
     },
     screen: {
         backgroundColor: "#fff",
-        // padding: 16,
-        paddingBottom: 78,
+        // paddingBottom: 78,
 
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
@@ -87,9 +73,10 @@ const styles = StyleSheet.create({
         paddingTop: 92,
         paddingLeft: 16,
         paddingRight: 16,
-        paddingBottom: 78,
-        position: "relative",
-        overflow: "visible"
+        // paddingBottom: 78,
+        // position: "relative",
+        overflow: "visible",
+        // flex: 1,
     },
     BtnLogOut: {
         position: "absolute",

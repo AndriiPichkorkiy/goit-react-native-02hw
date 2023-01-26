@@ -1,5 +1,4 @@
 export const getDateString = (dateString) => {
-  console.log(typeof +dateString);
   const date = new Date(+dateString);
   const day = (date.getDay() + "").padStart(2, "0");
   const months = getMonth(date.getUTCMonth());
@@ -22,5 +21,3 @@ function getMonth(idx) {
   return month;
 }
 
-console.log(getMonth(1));
-console.log(getMonth(12));

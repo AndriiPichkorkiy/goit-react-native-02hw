@@ -5,9 +5,8 @@ import noAvatarImg from "../../assets/images/minion.png";
 import { useSelector } from "react-redux";
 
 const Comment = ({ comment }) => {
-    console.log(comment)
     const { userId } = useSelector((state) => state.auth)
-    const isOwnComment = userId === comment.userId;
+    const isOwnComment = userId === comment.userOwner.userId;
     const date = getDateString(comment.dateset)
     const styleContainer = isOwnComment
         ? { ...styles.container, flexDirection: "row-reverse" }
@@ -19,11 +18,12 @@ const Comment = ({ comment }) => {
         ? ownCommentDate
         : anotherCommentDate
 
-    const avatar = comment.avatar ? comment.avatar : noAvatarImg
+    const avatar = comment.userOwner.photoURL
+    console.log('avatar', avatar)
 
     return (
         <View style={styleContainer}>
-            <Image source={avatar} style={styles.avatar} />
+            <Image source={{ uri: avatar }} style={styles.avatar} />
             <View style={styleComment}>
                 <Text style={styles.text}>{comment.comment}</Text>
                 <Text style={styleCommentDate}>{date}</Text>

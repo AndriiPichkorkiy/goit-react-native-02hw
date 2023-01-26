@@ -11,11 +11,11 @@ const InputLocation = ({ onFocus, onChangeText, value, style, onPress }) => {
                 onChangeText={onChangeText}
                 value={value}
                 placeholder="Місцевість..."
-                placeholderTextColor={style.color}
+                placeholderTextColor={style.placeholderTextColor}
                 onPressIn={onPress}
             />
 
-            <Feather name="map-pin" size={24} color={style.color} style={styles.showPassBtn} />
+            <Feather name="map-pin" size={24} color={style.placeholderTextColor} style={styles.showPassBtn} />
 
         </View>
     );
