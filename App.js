@@ -5,13 +5,13 @@ import * as Font from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 
 import { Provider } from "react-redux";
-import { store } from "./redux/store";
-import Main from "./Components/Main";
+import { store } from "./src/redux/store";
+import Main from "./src/Components/Main";
 
 const loadApplication = async () => {
   await Font.loadAsync({
-    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
-    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("./src/assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Regular": require("./src/assets/fonts/Roboto-Regular.ttf"),
   });
 };
 
